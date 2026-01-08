@@ -1,0 +1,376 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===============================================================================
+   LAYER: BASE
+   CSS Variables for Light Mode (Default)
+   =============================================================================== */
+
+@layer base {
+  :root {
+    /* -------------------------------------------------------------------------
+       BACKGROUND SYSTEM
+       ------------------------------------------------------------------------- */
+    --background: 0 0% 100%;
+    --background-subtle: 220 14% 98%;
+    --background-muted: 220 13% 96%;
+    --background-emphasis: 220 13% 93%;
+
+    /* -------------------------------------------------------------------------
+       FOREGROUND SYSTEM
+       ------------------------------------------------------------------------- */
+    --foreground: 222 47% 11%;
+    --foreground-secondary: 220 9% 46%;
+    --foreground-muted: 220 9% 56%;
+    --foreground-subtle: 220 9% 66%;
+
+    /* -------------------------------------------------------------------------
+       CARD
+       ------------------------------------------------------------------------- */
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --card-hover: 220 14% 98%;
+
+    /* -------------------------------------------------------------------------
+       POPOVER
+       ------------------------------------------------------------------------- */
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* -------------------------------------------------------------------------
+       PRIMARY - Blue (#3B82F6)
+       Actions, Stock Visualization, Interactive Elements
+       ------------------------------------------------------------------------- */
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 217 91% 55%;
+    --primary-active: 217 91% 50%;
+    --primary-muted: 217 91% 95%;
+    --primary-subtle: 217 91% 90%;
+
+    /* -------------------------------------------------------------------------
+       DESTRUCTIVE - Red (#EF4444)
+       Alerts, Demand Visualization, Warnings
+       ------------------------------------------------------------------------- */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-hover: 0 84% 55%;
+    --destructive-active: 0 84% 50%;
+    --destructive-muted: 0 84% 97%;
+    --destructive-subtle: 0 84% 93%;
+
+    /* -------------------------------------------------------------------------
+       SECONDARY - Slate Gray
+       Neutral UI Elements
+       ------------------------------------------------------------------------- */
+    --secondary: 220 9% 46%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 220 9% 40%;
+    --secondary-muted: 220 13% 96%;
+
+    /* -------------------------------------------------------------------------
+       ACCENT - Indigo (#6366F1)
+       Highlights, Focus States
+       ------------------------------------------------------------------------- */
+    --accent: 239 84% 67%;
+    --accent-foreground: 0 0% 100%;
+    --accent-muted: 239 84% 97%;
+
+    /* -------------------------------------------------------------------------
+       MUTED
+       ------------------------------------------------------------------------- */
+    --muted: 220 13% 96%;
+    --muted-foreground: 220 9% 46%;
+
+    /* -------------------------------------------------------------------------
+       SEMANTIC COLORS
+       ------------------------------------------------------------------------- */
+
+    /* Success - Green */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --success-muted: 142 71% 97%;
+    --success-subtle: 142 71% 93%;
+
+    /* Warning - Amber */
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --warning-muted: 38 92% 97%;
+    --warning-subtle: 38 92% 90%;
+
+    /* Info - Cyan */
+    --info: 189 94% 43%;
+    --info-foreground: 0 0% 100%;
+    --info-muted: 189 94% 97%;
+    --info-subtle: 189 94% 90%;
+
+    /* -------------------------------------------------------------------------
+       UI ELEMENTS
+       ------------------------------------------------------------------------- */
+    --border: 220 13% 91%;
+    --border-muted: 220 13% 95%;
+    --border-emphasis: 220 13% 85%;
+    --border-focus: 217 91% 60%;
+
+    --input: 220 13% 91%;
+    --input-focus: 217 91% 60%;
+
+    --ring: 217 91% 60%;
+    --ring-offset: 0 0% 100%;
+
+    /* -------------------------------------------------------------------------
+       CHART COLORS
+       ------------------------------------------------------------------------- */
+    --chart-1: 217 91% 60%;
+    --chart-2: 0 84% 60%;
+    --chart-3: 142 71% 45%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 239 84% 67%;
+    --chart-6: 189 94% 43%;
+
+    /* -------------------------------------------------------------------------
+       SHADOWS
+       ------------------------------------------------------------------------- */
+    --shadow-color: 220 13% 10%;
+
+    /* -------------------------------------------------------------------------
+       LAYOUT
+       ------------------------------------------------------------------------- */
+    --radius: 0.5rem;
+    --sidebar-width: 280px;
+    --header-height: 64px;
+  }
+
+  /* ===========================================================================
+     DARK MODE
+     =========================================================================== */
+  .dark {
+    /* Background System */
+    --background: 222 47% 6%;
+    --background-subtle: 222 47% 8%;
+    --background-muted: 222 47% 11%;
+    --background-emphasis: 222 47% 14%;
+
+    /* Foreground System */
+    --foreground: 220 13% 95%;
+    --foreground-secondary: 220 9% 70%;
+    --foreground-muted: 220 9% 60%;
+    --foreground-subtle: 220 9% 50%;
+
+    /* Card */
+    --card: 222 47% 8%;
+    --card-foreground: 220 13% 95%;
+    --card-hover: 222 47% 11%;
+
+    /* Popover */
+    --popover: 222 47% 8%;
+    --popover-foreground: 220 13% 95%;
+
+    /* Primary - Blue (slightly adjusted for dark mode) */
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 217 91% 65%;
+    --primary-active: 217 91% 55%;
+    --primary-muted: 217 91% 15%;
+    --primary-subtle: 217 91% 20%;
+
+    /* Destructive - Red (slightly adjusted for dark mode) */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-hover: 0 84% 65%;
+    --destructive-active: 0 84% 55%;
+    --destructive-muted: 0 84% 15%;
+    --destructive-subtle: 0 84% 20%;
+
+    /* Secondary */
+    --secondary: 220 9% 60%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 220 9% 65%;
+    --secondary-muted: 222 47% 14%;
+
+    /* Accent */
+    --accent: 239 84% 67%;
+    --accent-foreground: 0 0% 100%;
+    --accent-muted: 239 84% 15%;
+
+    /* Muted */
+    --muted: 222 47% 14%;
+    --muted-foreground: 220 9% 60%;
+
+    /* Semantic Colors */
+    --success: 142 71% 50%;
+    --success-foreground: 0 0% 100%;
+    --success-muted: 142 71% 15%;
+    --success-subtle: 142 71% 20%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 100%;
+    --warning-muted: 38 92% 15%;
+    --warning-subtle: 38 92% 20%;
+
+    --info: 189 94% 48%;
+    --info-foreground: 0 0% 100%;
+    --info-muted: 189 94% 15%;
+    --info-subtle: 189 94% 20%;
+
+    /* Borders */
+    --border: 222 47% 18%;
+    --border-muted: 222 47% 14%;
+    --border-emphasis: 222 47% 25%;
+    --border-focus: 217 91% 60%;
+
+    --input: 222 47% 18%;
+    --input-focus: 217 91% 60%;
+
+    --ring: 217 91% 60%;
+    --ring-offset: 222 47% 6%;
+
+    /* Shadow */
+    --shadow-color: 222 47% 3%;
+  }
+
+  /* ===========================================================================
+     BASE STYLES
+     =========================================================================== */
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Headings use display font */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-semibold tracking-tight;
+  }
+
+  h1 {
+    @apply text-4xl leading-tight;
+  }
+
+  h2 {
+    @apply text-3xl leading-tight;
+  }
+
+  h3 {
+    @apply text-2xl leading-snug;
+  }
+
+  h4 {
+    @apply text-xl leading-snug;
+  }
+
+  h5 {
+    @apply text-lg leading-snug;
+  }
+
+  h6 {
+    @apply text-base leading-snug;
+  }
+
+  /* Code uses mono font */
+  code, kbd, pre, samp {
+    @apply font-mono;
+  }
+
+  /* Tabular figures for numerical data */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Focus visible styles */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-primary/20 text-foreground;
+  }
+}
+
+/* ===============================================================================
+   LAYER: COMPONENTS
+   Reusable component styles
+   =============================================================================== */
+
+@layer components {
+  /* Staggered entrance animations */
+  .animate-stagger {
+    @apply animate-fade-in-up;
+  }
+
+  .animate-stagger-1 { animation-delay: 0ms; }
+  .animate-stagger-2 { animation-delay: 50ms; }
+  .animate-stagger-3 { animation-delay: 100ms; }
+  .animate-stagger-4 { animation-delay: 150ms; }
+  .animate-stagger-5 { animation-delay: 200ms; }
+  .animate-stagger-6 { animation-delay: 250ms; }
+  .animate-stagger-7 { animation-delay: 300ms; }
+  .animate-stagger-8 { animation-delay: 350ms; }
+
+  /* Hover lift effect */
+  .hover-lift {
+    @apply transition-all duration-200;
+  }
+
+  .hover-lift:hover {
+    @apply -translate-y-0.5 shadow-md;
+  }
+}
+
+/* ===============================================================================
+   LAYER: UTILITIES
+   Custom utility classes
+   =============================================================================== */
+
+@layer utilities {
+  /* Skeleton loading shimmer */
+  .skeleton {
+    @apply bg-muted animate-shimmer;
+    background-image: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--background-emphasis)) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  /* Glass morphism effect */
+  .glass {
+    @apply bg-background/80 backdrop-blur-xl backdrop-saturate-150;
+  }
+
+  /* Hide scrollbar */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ===============================================================================
+   REDUCED MOTION
+   Accessibility: respect user preferences
+   =============================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
