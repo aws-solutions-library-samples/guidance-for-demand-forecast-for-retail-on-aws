@@ -1,0 +1,35 @@
+{
+  "name": "retail-forecast-cdk",
+  "version": "1.0.0",
+  "description": "CDK infrastructure for Demand Forecasting PoC",
+  "bin": {
+    "app": "bin/app.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "synth": "cdk synth --all",
+    "deploy": "cdk deploy --all --require-approval never",
+    "destroy": "cdk destroy --all",
+    "lint": "eslint 'bin/**/*.ts' 'lib/**/*.ts'",
+    "lint:fix": "eslint --fix 'bin/**/*.ts' 'lib/**/*.ts'",
+    "format": "prettier --write 'bin/**/*.ts' 'lib/**/*.ts'",
+    "format:check": "prettier --check 'bin/**/*.ts' 'lib/**/*.ts'",
+    "validate": "npm run format:check && npm run lint && npm run build"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.244.0",
+    "constructs": "^10.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "esbuild": "^0.28.1",
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "~5.7.2"
+  }
+}

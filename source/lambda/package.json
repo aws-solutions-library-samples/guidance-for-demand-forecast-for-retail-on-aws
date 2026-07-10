@@ -1,0 +1,27 @@
+{
+  "name": "retail-forecast-lambda",
+  "version": "1.0.0",
+  "description": "Lambda functions for Demand Forecasting PoC",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@aws-sdk/client-athena": "^3.700.0",
+    "@aws-sdk/client-dynamodb": "^3.700.0",
+    "@aws-sdk/client-lambda": "^3.1014.0",
+    "@aws-sdk/client-quicksight": "^3.700.0",
+    "@aws-sdk/client-s3": "^3.700.0",
+    "@aws-sdk/client-sagemaker": "^3.700.0",
+    "@aws-sdk/client-sagemaker-runtime": "^3.1014.0",
+    "@aws-sdk/s3-request-presigner": "^3.700.0",
+    "adm-zip": "^0.5.17"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.1016.0",
+    "@types/adm-zip": "^0.5.8",
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^22.10.0",
+    "typescript": "~5.7.2"
+  }
+}
