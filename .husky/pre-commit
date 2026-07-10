@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "\nRunning code formatting and quality checks...\n"
+npx lint-staged --allow-empty

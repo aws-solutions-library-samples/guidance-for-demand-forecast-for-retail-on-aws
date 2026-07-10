@@ -1,0 +1,298 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --background-subtle: 210 40% 96%;
+    --background-muted: 220 14% 96%;
+    --background-emphasis: 220 13% 93%;
+
+    --foreground: 222 47% 11%;
+    --foreground-secondary: 215 16% 47%;
+    --foreground-muted: 215 16% 57%;
+    --foreground-subtle: 215 16% 67%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --card-hover: 210 40% 98%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 217 91% 55%;
+    --primary-active: 217 91% 50%;
+    --primary-muted: 217 91% 96%;
+    --primary-subtle: 217 91% 92%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-hover: 0 84% 55%;
+    --destructive-active: 0 84% 50%;
+    --destructive-muted: 0 84% 97%;
+    --destructive-subtle: 0 84% 93%;
+
+    --secondary: 215 16% 47%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 215 16% 40%;
+    --secondary-muted: 220 14% 96%;
+
+    --accent: 24 95% 53%;
+    --accent-foreground: 0 0% 100%;
+    --accent-muted: 24 95% 96%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --success-muted: 142 71% 97%;
+    --success-subtle: 142 71% 93%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --warning-muted: 38 92% 97%;
+    --warning-subtle: 38 92% 90%;
+
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+    --info-muted: 199 89% 97%;
+    --info-subtle: 199 89% 90%;
+
+    --border: 220 13% 91%;
+    --border-muted: 220 13% 95%;
+    --border-emphasis: 220 13% 85%;
+    --border-focus: 217 91% 60%;
+
+    --input: 220 13% 91%;
+    --input-focus: 217 91% 60%;
+
+    --ring: 217 91% 60%;
+    --ring-offset: 0 0% 100%;
+
+    --chart-1: 217 91% 60%;
+    --chart-2: 0 84% 60%;
+    --chart-3: 142 71% 45%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 239 84% 67%;
+    --chart-6: 199 89% 48%;
+
+    --shadow-color: 220 13% 10%;
+
+    --radius: 0.5rem;
+    --sidebar-width: 280px;
+    --header-height: 64px;
+  }
+
+  .dark {
+    --background: 222 47% 6%;
+    --background-subtle: 222 47% 8%;
+    --background-muted: 222 47% 11%;
+    --background-emphasis: 222 47% 14%;
+
+    --foreground: 210 40% 98%;
+    --foreground-secondary: 215 20% 65%;
+    --foreground-muted: 215 16% 57%;
+    --foreground-subtle: 215 16% 47%;
+
+    --card: 222 47% 8%;
+    --card-foreground: 210 40% 98%;
+    --card-hover: 222 47% 11%;
+
+    --popover: 222 47% 8%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 217 91% 65%;
+    --primary-active: 217 91% 55%;
+    --primary-muted: 217 91% 15%;
+    --primary-subtle: 217 91% 20%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-hover: 0 84% 65%;
+    --destructive-active: 0 84% 55%;
+    --destructive-muted: 0 84% 15%;
+    --destructive-subtle: 0 84% 20%;
+
+    --secondary: 215 20% 65%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 215 16% 70%;
+    --secondary-muted: 222 47% 14%;
+
+    --accent: 24 95% 53%;
+    --accent-foreground: 0 0% 100%;
+    --accent-muted: 24 95% 15%;
+
+    --muted: 222 47% 14%;
+    --muted-foreground: 215 16% 57%;
+
+    --success: 142 71% 50%;
+    --success-foreground: 0 0% 100%;
+    --success-muted: 142 71% 15%;
+    --success-subtle: 142 71% 20%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 100%;
+    --warning-muted: 38 92% 15%;
+    --warning-subtle: 38 92% 20%;
+
+    --info: 199 89% 48%;
+    --info-foreground: 0 0% 100%;
+    --info-muted: 199 89% 15%;
+    --info-subtle: 199 89% 20%;
+
+    --border: 222 47% 18%;
+    --border-muted: 222 47% 14%;
+    --border-emphasis: 222 47% 25%;
+    --border-focus: 217 91% 60%;
+
+    --input: 222 47% 18%;
+    --input-focus: 217 91% 60%;
+
+    --ring: 217 91% 60%;
+    --ring-offset: 222 47% 6%;
+
+    --shadow-color: 222 47% 3%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display font-semibold tracking-tight;
+  }
+
+  h1 {
+    @apply text-4xl leading-tight;
+  }
+  h2 {
+    @apply text-3xl leading-tight;
+  }
+  h3 {
+    @apply text-2xl leading-snug;
+  }
+  h4 {
+    @apply text-xl leading-snug;
+  }
+  h5 {
+    @apply text-lg leading-snug;
+  }
+  h6 {
+    @apply text-base leading-snug;
+  }
+
+  code,
+  kbd,
+  pre,
+  samp {
+    @apply font-mono;
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  ::selection {
+    @apply bg-primary/20 text-foreground;
+  }
+}
+
+@layer components {
+  .animate-stagger {
+    @apply animate-fade-in-up;
+  }
+
+  .animate-stagger-1 {
+    animation-delay: 0ms;
+  }
+  .animate-stagger-2 {
+    animation-delay: 50ms;
+  }
+  .animate-stagger-3 {
+    animation-delay: 100ms;
+  }
+  .animate-stagger-4 {
+    animation-delay: 150ms;
+  }
+  .animate-stagger-5 {
+    animation-delay: 200ms;
+  }
+  .animate-stagger-6 {
+    animation-delay: 250ms;
+  }
+  .animate-stagger-7 {
+    animation-delay: 300ms;
+  }
+  .animate-stagger-8 {
+    animation-delay: 350ms;
+  }
+
+  .hover-lift {
+    @apply transition-all duration-200;
+  }
+
+  .hover-lift:hover {
+    @apply -translate-y-0.5 shadow-md;
+  }
+}
+
+@layer utilities {
+  .skeleton {
+    @apply bg-muted animate-shimmer;
+    background-image: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--background-emphasis)) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  .glass {
+    @apply bg-background/80 backdrop-blur-xl backdrop-saturate-150;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
