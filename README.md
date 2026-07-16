@@ -34,7 +34,6 @@ The entire flow is event-driven and automated: uploading a new sales dataset to 
 
 ![Reference Architecture](assets/images/reference-architecture.png)
 
-> The editable source diagram is available at `guidance-docs/architecture-diagram.pptx`.
 
 **Architecture flow:**
 
