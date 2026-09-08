@@ -156,11 +156,14 @@ function generateMockProjections(
       stock += purchaseArrival.quantity;
     }
 
+    // Stock available at start of day, before demand is consumed
+    const availableStock = stock;
+
     stock = Math.max(0, stock - demand);
 
     projections.push({
       date: date.toISOString().split('T')[0],
-      availableStock: Math.max(0, stock + demand), // Stock at start of day
+      availableStock: Math.max(0, availableStock),
       forecastedDemand: demand,
       projectedStock: stock,
       stockShortage: stock <= 0,

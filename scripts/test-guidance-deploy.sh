@@ -19,7 +19,7 @@ cd "$REPO_ROOT"
 # CONFIGURATION
 # ============================================================
 export AWS_REGION="us-east-1"
-ADMIN_EMAIL="wwso-guidance-deployments-ignore@amazon.com"
+ADMIN_EMAIL="admin@example.com"
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 echo "Account: $ACCOUNT_ID | Region: $AWS_REGION"
 

@@ -53,6 +53,7 @@ export function SimulatePurchasePanel({
       purchaseQuantity: quantity,
       leadTimeDays,
       currentStock,
+      forecastStartDate: forecastDates?.[0],
     });
     if (result) onSimulationResult(result);
   };

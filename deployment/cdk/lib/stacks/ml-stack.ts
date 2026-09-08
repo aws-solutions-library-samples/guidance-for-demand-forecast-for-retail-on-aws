@@ -20,7 +20,8 @@ export class MLStack extends cdk.Stack {
 
     // SageMaker Execution Role
     this.sagemakerRole = new iam.Role(this, 'SageMakerExecutionRole', {
-      roleName: 'retail-forecast-sagemaker-role',
+      // Name omitted so CloudFormation generates a unique role name, allowing
+      // multiple Guidance instances to coexist in the same account/Region.
       assumedBy: new iam.ServicePrincipal('sagemaker.amazonaws.com'),
       description: 'Execution role for SageMaker Autopilot training and inference jobs',
     });

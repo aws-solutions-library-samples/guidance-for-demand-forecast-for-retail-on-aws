@@ -34,7 +34,6 @@ The entire flow is event-driven and automated: uploading a new sales dataset to 
 
 ![Reference Architecture](assets/images/reference-architecture.png)
 
-
 **Architecture flow:**
 
 1. Users authenticate through **Amazon Cognito** and access the web application served from **Amazon S3** and distributed by **Amazon CloudFront**.
@@ -282,7 +281,7 @@ The Guidance ships with sample data so you can run it end to end immediately.
 **Guidance inputs:**
 
 - Sample historical sales time-series data (`assets/data/consumer_electronics.csv`, ~8,900 rows) and product metadata (`assets/data/products_metadata.csv`) are deployed to the raw data S3 bucket automatically.
-- A sample upload archive is available at `assets/test-data/sample_sales.zip` for testing the in-app dataset upload feature.
+- A sample sales CSV is available at `assets/test-data/sample_sales.csv` for testing the in-app dataset upload feature. The upload feature accepts a `.zip`, so create one from the CSV first (for example `zip sample_sales.zip sample_sales.csv`).
 
 **Steps to run:**
 
@@ -307,7 +306,7 @@ The Guidance ships with sample data so you can run it end to end immediately.
 **Expected output:**
 
 - The Step Functions execution reaches the `PipelineSucceeded` state.
-- Forecast output files appear in the `retail-forecast-outputs-<account>-<region>` S3 bucket.
+- Forecast output files appear in the forecast outputs S3 bucket (see the `OutputsBucketName` stack output / CloudFormation export).
 - The application displays per-product demand forecasts, stock projections, and what-if price scenarios.
 
 ## Next Steps

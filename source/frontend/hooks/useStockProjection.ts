@@ -20,6 +20,23 @@ interface WhatIfInput {
   leadTimeDays: number;
 }
 
+// Format a Date as a local YYYY-MM-DD string (avoids toISOString timezone shifts).
+function toYMD(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// Parse a forecast timestamp ("2026-08-29 00:00:00" / "2026-08-29T..." / "2026-08-29")
+// into a local Date. Falls back to today when no start date is provided.
+function parseAnchorDate(forecastStartDate?: string): Date {
+  if (forecastStartDate) {
+    const parts = forecastStartDate.split(/[-T ]/);
+    if (parts.length >= 3) {
+      return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    }
+  }
+  return new Date();
+}
+
 export function useStockProjection(currentStock: number = 100): UseStockProjectionReturn {
   const [projection, setProjection] = useState<StockProjection[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +87,10 @@ export function useStockProjection(currentStock: number = 100): UseStockProjecti
         setShortageDate(response.shortageDate || null);
 
         return {
-          projectedStock: response.projections.map((p) => p.projectedStock),
+          // Plot start-of-day available stock (includes the order arrival on its day)
+          // so the simulated line tracks the baseline "Available Stock" line and
+          // steps up by the order quantity on the arrival day.
+          projectedStock: response.projections.map((p) => p.availableStock),
           arrivalDate: response.scenario.arrivalDate,
           shortageDate: response.shortageDate,
         };
@@ -121,19 +141,26 @@ export function useWhatIf() {
   const [error, setError] = useState<Error | null>(null);
 
   const runSimulation = useCallback(
-    async (input: WhatIfInput & { currentStock?: number }): Promise<SimulationResult | null> => {
+    async (
+      input: WhatIfInput & { currentStock?: number; forecastStartDate?: string },
+    ): Promise<SimulationResult | null> => {
       setIsLoading(true);
       setError(null);
       try {
-        const today = new Date();
-        const arrivalDate = new Date(today);
-        arrivalDate.setDate(arrivalDate.getDate() + input.leadTimeDays);
+        // Anchor the order to the forecast window start (not the browser's "today").
+        // The backend simulation and the chart both operate over the forecast dates,
+        // so anchoring to today can push the arrival outside the window — the arrival
+        // line would render but the stock bump would never be applied. Using the
+        // forecast start guarantees the arrival lands on a real forecast day.
+        const anchor = parseAnchorDate(input.forecastStartDate);
+        const arrival = new Date(anchor);
+        arrival.setDate(arrival.getDate() + input.leadTimeDays);
 
         const purchaseOrder: PurchaseOrder = {
           quantity: input.purchaseQuantity,
-          orderDate: today.toISOString().split('T')[0],
+          orderDate: toYMD(anchor),
           leadTimeDays: input.leadTimeDays,
-          arrivalDate: arrivalDate.toISOString().split('T')[0],
+          arrivalDate: toYMD(arrival),
         };
 
         const request: WhatIfRequest = {
@@ -146,7 +173,10 @@ export function useWhatIf() {
         const response = await runWhatIfScenario(request);
 
         return {
-          projectedStock: response.projections.map((p) => p.projectedStock),
+          // Plot start-of-day available stock (includes the order arrival on its day)
+          // so the simulated line tracks the baseline "Available Stock" line and
+          // steps up by the order quantity on the arrival day.
+          projectedStock: response.projections.map((p) => p.availableStock),
           arrivalDate: response.scenario.arrivalDate,
           shortageDate: response.shortageDate,
         };

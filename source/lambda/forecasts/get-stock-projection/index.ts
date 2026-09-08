@@ -68,7 +68,11 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       // Use p50 (median) forecast as expected demand
       const dailyDemand = forecasts[day]?.p50 || 0;
 
-      // Subtract demand from stock
+      // Stock available at the start of the day (before demand is consumed).
+      // Captured before clamping so it reflects true inventory and can reach 0.
+      const availableStock = runningStock;
+
+      // Subtract demand from stock (end-of-day remaining), clamped at 0
       runningStock = Math.max(0, runningStock - dailyDemand);
       const stockShortage = runningStock <= 0;
 
@@ -79,7 +83,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
       projections.push({
         date: dateStr,
-        availableStock: Math.round(runningStock + dailyDemand),
+        availableStock: Math.round(availableStock),
         forecastedDemand: Math.round(dailyDemand),
         projectedStock: Math.round(runningStock),
         stockShortage,

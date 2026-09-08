@@ -91,7 +91,8 @@ export class PipelineStack extends cdk.Stack {
         ...commonLambdaProps,
         entry: path.join(lambdaDir, dir, 'index.ts'),
         handler: 'handler',
-        functionName: `retail-forecast-pipeline-${dir}`,
+        // Function name omitted so CloudFormation generates a unique name,
+        // allowing multiple Guidance instances per account/Region.
         environment: pipelineEnv,
         bundling: { minify: true, sourceMap: true, externalModules: ['@aws-sdk/*'] },
       });
@@ -180,7 +181,8 @@ export class PipelineStack extends cdk.Stack {
     const definition = startTraining.next(waitForTraining);
 
     this.stateMachine = new sfn.StateMachine(this, 'ForecastPipeline', {
-      stateMachineName: 'retail-forecast-pipeline',
+      // Name omitted so CloudFormation generates a unique state machine name.
+      // The ARN is exported (PipelineStateMachineArn) for scripts to look up.
       definitionBody: sfn.DefinitionBody.fromChainable(definition),
       timeout: cdk.Duration.hours(6),
       // SF2 / SC7: enable AWS X-Ray tracing for the pipeline
@@ -330,6 +332,8 @@ exports.handler = async (event) => {
 
     new cdk.CfnOutput(this, 'StateMachineArn', {
       value: this.stateMachine.stateMachineArn,
+      description: 'ARN of the forecast pipeline Step Functions state machine',
+      exportName: 'PipelineStateMachineArn',
     });
   }
 }

@@ -6,9 +6,10 @@
 # Cross-platform: macOS, Linux, and Windows (WSL / Git Bash).
 #
 # Usage:
-#   ADMIN_EMAIL=you@example.com ./scripts/deploy.sh           # deploy
-#   ADMIN_EMAIL=you@example.com ./scripts/deploy.sh --train   # deploy + start ML pipeline
+#   ADMIN_EMAIL=you@example.com ./scripts/deploy.sh           # deploy only (data unchanged, no training)
+#   ADMIN_EMAIL=you@example.com ./scripts/deploy.sh --train   # regenerate sample data + deploy + start ML pipeline
 #   AWS_REGION=us-west-2 ADMIN_EMAIL=you@example.com ./scripts/deploy.sh   # override Region
+#   DATASET_END_DATE=2026-01-31 ADMIN_EMAIL=you@example.com ./scripts/deploy.sh  # override dataset end date (default: today)
 set -e
 
 # ============================================================
@@ -17,6 +18,14 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$REPO_ROOT"
+
+# Training is opt-in via --train. When enabled, we regenerate a fresh sample
+# dataset (which the CDK BucketDeployment uploads, triggering the pipeline) and
+# ensure a training run is started.
+TRAIN=false
+if [ "${1:-}" = "--train" ]; then
+  TRAIN=true
+fi
 
 # ============================================================
 # PLATFORM DETECTION
@@ -40,6 +49,9 @@ check_prerequisites() {
   command -v node >/dev/null 2>&1 || { echo "ERROR: Node.js 20+ is required — https://nodejs.org/"; exit 1; }
   command -v npm >/dev/null 2>&1 || { echo "ERROR: npm is required."; exit 1; }
   command -v jq >/dev/null 2>&1 || { echo "ERROR: jq is required — https://jqlang.github.io/jq/"; exit 1; }
+  if [ "$TRAIN" = true ]; then
+    command -v python3 >/dev/null 2>&1 || { echo "ERROR: Python 3 is required to generate the sample dataset for --train — https://www.python.org/"; exit 1; }
+  fi
   aws sts get-caller-identity >/dev/null 2>&1 || { echo "ERROR: AWS credentials not configured. Run 'aws configure'."; exit 1; }
 }
 
@@ -64,6 +76,27 @@ if [ -n "${ADMIN_EMAIL:-}" ]; then
   CONTEXT_ARGS="--context adminEmails=$ADMIN_EMAIL"
 else
   echo "WARNING: no ADMIN_EMAIL provided — using 'adminEmails' from cdk.json. No admin will be created if that is the placeholder."
+fi
+
+# ============================================================
+# GENERATE SAMPLE DATASET (only with --train)
+# ============================================================
+# Regenerating rewrites assets/data/consumer_electronics.csv, which the CDK
+# BucketDeployment (data-stack) then re-uploads — and that upload fires the S3
+# event that starts the training pipeline. So we only regenerate when training
+# is requested (--train). A plain deploy leaves the data untouched, avoiding an
+# unintended (billable) training run.
+# Override the history end date with DATASET_END_DATE=YYYY-MM-DD (defaults to today).
+if [ "$TRAIN" = true ]; then
+  echo "Generating sample dataset..."
+  if [ -n "${DATASET_END_DATE:-}" ]; then
+    echo "Dataset end date: $DATASET_END_DATE"
+    python3 scripts/generate-dataset.py --end-date "$DATASET_END_DATE"
+  else
+    python3 scripts/generate-dataset.py
+  fi
+else
+  echo "Skipping dataset generation (no --train). Deployed data is left unchanged."
 fi
 
 # ============================================================
@@ -136,14 +169,30 @@ echo "Sign up with your admin email, then sign out and back in once to get admin
 # ============================================================
 # OPTIONAL: start the ML training pipeline
 # ============================================================
-if [ "${1:-}" = "--train" ]; then
-  SM_ARN=$(aws stepfunctions list-state-machines \
-    --query "stateMachines[?contains(name,'retail-forecast')].stateMachineArn" \
+if [ "$TRAIN" = true ]; then
+  # State machine name is CDK-generated (not hardcoded), so look up its ARN from
+  # the CloudFormation export rather than filtering by name.
+  SM_ARN=$(aws cloudformation list-exports \
+    --query "Exports[?Name=='PipelineStateMachineArn'].Value" \
     --output text --region "$REGION")
-  echo "Starting ML pipeline..."
-  EXEC=$(aws stepfunctions start-execution --state-machine-arn "$SM_ARN" --input '{}' \
-    --region "$REGION" --query 'executionArn' --output text)
-  echo "Pipeline started: $EXEC"
+
+  # The data upload during 'cdk deploy' (BucketDeployment writing
+  # data/sales/consumer_electronics.csv) fires an S3 event that auto-starts the
+  # pipeline. To avoid launching a duplicate (and a second billable SageMaker
+  # run), only start a new execution if one is not already running.
+  RUNNING_EXEC=$(aws stepfunctions list-executions --state-machine-arn "$SM_ARN" \
+    --status-filter RUNNING --max-results 1 \
+    --query 'executions[0].executionArn' --output text --region "$REGION" 2>/dev/null || true)
+
+  if [ -n "$RUNNING_EXEC" ] && [ "$RUNNING_EXEC" != "None" ]; then
+    echo "ML pipeline already running (auto-started by the data upload): $RUNNING_EXEC"
+    echo "Skipping duplicate start."
+  else
+    echo "Starting ML pipeline..."
+    EXEC=$(aws stepfunctions start-execution --state-machine-arn "$SM_ARN" --input '{}' \
+      --region "$REGION" --query 'executionArn' --output text)
+    echo "Pipeline started: $EXEC"
+  fi
 fi
 
 # ============================================================
