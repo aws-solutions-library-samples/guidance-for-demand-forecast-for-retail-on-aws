@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generate synthetic retail demand dataset with future rows for what-if inference."""
 
+import argparse
 import csv
 import math
 import random
@@ -24,9 +25,43 @@ PRODUCTS = [
 ]
 
 STORE_ID = "store_001"
-START_DATE = datetime(2024, 3, 23)
-END_DATE = datetime(2026, 3, 22)
 FORECAST_HORIZON = 14
+HISTORY_YEARS = 2
+
+
+def _subtract_years(date, years):
+    """Subtract whole years from a date, handling Feb 29 by clamping to Feb 28."""
+    try:
+        return date.replace(year=date.year - years)
+    except ValueError:
+        # date is Feb 29 and the target year is not a leap year
+        return date.replace(year=date.year - years, day=28)
+
+
+def _parse_end_date(value):
+    try:
+        return datetime.strptime(value, "%Y-%m-%d")
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"Invalid date '{value}'. Expected format YYYY-MM-DD."
+        )
+
+
+parser = argparse.ArgumentParser(
+    description="Generate synthetic retail demand dataset with future rows for what-if inference."
+)
+parser.add_argument(
+    "--end-date",
+    type=_parse_end_date,
+    default=datetime.now().replace(hour=0, minute=0, second=0, microsecond=0),
+    help="Last date of historical data (YYYY-MM-DD). Defaults to today. "
+    f"Start date is always {HISTORY_YEARS} years before this, and the forecast "
+    f"horizon adds {FORECAST_HORIZON} future days after it.",
+)
+args = parser.parse_args()
+
+END_DATE = args.end_date
+START_DATE = _subtract_years(END_DATE, HISTORY_YEARS)
 
 def seasonal_factor(day_of_year, product_type):
     base = 1.0
@@ -78,7 +113,6 @@ while current <= END_DATE:
         elasticity = price_elasticity(price, product["base_price"])
         demand = product["base_demand"] * season * dow * noise * trend * elasticity
         demand = max(1, round(demand, 2))
-        price = price_variation(product["base_price"], day_of_year)
         rows.append({
             "item_id": product["id"],
             "store_id": STORE_ID,

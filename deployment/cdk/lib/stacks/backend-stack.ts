@@ -257,7 +257,8 @@ export class BackendStack extends cdk.Stack {
 
     // DynamoDB table for tracking upload status
     const uploadStatusTable = new dynamodb.Table(this, 'UploadStatusTable', {
-      tableName: 'retail-forecast-upload-status',
+      // Name omitted so CloudFormation generates a unique table name (passed to
+      // Lambdas via env), allowing multiple Guidance instances per account/Region.
       partitionKey: { name: 'pk', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'sk', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,

@@ -34,11 +34,20 @@ export class DataStack extends cdk.Stack {
     super(scope, id, props);
 
     const account = cdk.Stack.of(this).account;
-    const region = cdk.Stack.of(this).region;
+
+    // Deterministic, stack-unique suffix so resources that REQUIRE an explicit
+    // name (Glue database, Glue crawler, Athena workgroup) don't collide when the
+    // Guidance is deployed as multiple instances in the same account/Region.
+    // node.addr is a lowercase-hex hash of the construct path, so it is stable per
+    // stack instance and safe for Glue's [a-z0-9_] naming rules.
+    const uniqueSuffix = this.node.addr.slice(0, 8);
+    const glueDatabaseName = `retail_forecast_db_${uniqueSuffix}`;
+    const athenaWorkgroupName = `retail-forecast-workgroup-${uniqueSuffix}`;
 
     // S1: dedicated bucket for S3 server access logs.
+    // Bucket names are intentionally omitted so CloudFormation generates unique
+    // physical names (avoids cross-instance collisions in one account/Region).
     const accessLogsBucket = new s3.Bucket(this, 'AccessLogsBucket', {
-      bucketName: `retail-forecast-s3-logs-${account}-${region}`,
       encryption: s3.BucketEncryption.S3_MANAGED,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -53,7 +62,6 @@ export class DataStack extends cdk.Stack {
 
     // S3 Bucket for raw sales data
     this.rawDataBucket = new s3.Bucket(this, 'RawDataBucket', {
-      bucketName: `retail-forecast-raw-${account}-${region}`,
       encryption: s3.BucketEncryption.S3_MANAGED,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -72,7 +80,6 @@ export class DataStack extends cdk.Stack {
 
     // S3 Bucket for forecast outputs and model artifacts
     this.outputsBucket = new s3.Bucket(this, 'OutputsBucket', {
-      bucketName: `retail-forecast-outputs-${account}-${region}`,
       encryption: s3.BucketEncryption.S3_MANAGED,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -84,7 +91,6 @@ export class DataStack extends cdk.Stack {
 
     // S3 Bucket for Athena query results
     this.athenaResultsBucket = new s3.Bucket(this, 'AthenaResultsBucket', {
-      bucketName: `retail-forecast-athena-${account}-${region}`,
       encryption: s3.BucketEncryption.S3_MANAGED,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -124,7 +130,7 @@ export class DataStack extends cdk.Stack {
     this.glueDatabase = new glue.CfnDatabase(this, 'GlueDatabase', {
       catalogId: account,
       databaseInput: {
-        name: 'retail_forecast_db',
+        name: glueDatabaseName,
         description: 'Retail demand forecast data catalog',
       },
     });
@@ -132,7 +138,7 @@ export class DataStack extends cdk.Stack {
     // Glue Table for sales data (consumer_electronics.csv)
     const salesTable = new glue.CfnTable(this, 'SalesDataTable', {
       catalogId: account,
-      databaseName: 'retail_forecast_db',
+      databaseName: glueDatabaseName,
       tableInput: {
         name: 'sales_data',
         description: 'Historical sales data with demand and price',
@@ -166,7 +172,7 @@ export class DataStack extends cdk.Stack {
 
     const metadataTable = new glue.CfnTable(this, 'ProductMetadataTable', {
       catalogId: account,
-      databaseName: 'retail_forecast_db',
+      databaseName: glueDatabaseName,
       tableInput: {
         name: 'products_metadata',
         description: 'Product catalog with descriptions, types, and image keys',
@@ -210,9 +216,9 @@ export class DataStack extends cdk.Stack {
 
     // Glue Crawler for auto-discovering schema changes
     const crawler = new glue.CfnCrawler(this, 'DataCrawler', {
-      name: 'retail-forecast-crawler',
+      name: `retail-forecast-crawler-${uniqueSuffix}`,
       role: glueRole.roleArn,
-      databaseName: 'retail_forecast_db',
+      databaseName: glueDatabaseName,
       targets: {
         s3Targets: [
           {
@@ -235,7 +241,7 @@ export class DataStack extends cdk.Stack {
 
     // Athena Workgroup
     this.athenaWorkgroup = new athena.CfnWorkGroup(this, 'AthenaWorkgroup', {
-      name: 'retail-forecast-workgroup',
+      name: athenaWorkgroupName,
       description: 'Workgroup for retail forecast queries',
       state: 'ENABLED',
       workGroupConfiguration: {
@@ -259,8 +265,8 @@ export class DataStack extends cdk.Stack {
     this.outputsBucketName = this.outputsBucket.bucketName;
     this.outputsBucketArn = this.outputsBucket.bucketArn;
     this.athenaResultsBucketName = this.athenaResultsBucket.bucketName;
-    this.glueDatabaseName = 'retail_forecast_db';
-    this.athenaWorkgroupName = 'retail-forecast-workgroup';
+    this.glueDatabaseName = glueDatabaseName;
+    this.athenaWorkgroupName = athenaWorkgroupName;
 
     // Stack Outputs
     new cdk.CfnOutput(this, 'RawDataBucketNameOutput', {
