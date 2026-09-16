@@ -19,6 +19,7 @@ import {
   KeyRound,
   CheckCircle2,
 } from 'lucide-react';
+import { validatePassword, PASSWORD_HINT } from '@/lib/password';
 import type { AuthError } from '@/types';
 
 interface SignupFormProps {
@@ -59,11 +60,8 @@ export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       next.email = 'Please enter a valid email';
     }
-    if (!formData.password) {
-      next.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      next.password = 'Password must be at least 8 characters';
-    }
+    const passwordError = validatePassword(formData.password);
+    if (passwordError) next.password = passwordError;
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -273,9 +271,7 @@ export function SignupForm({ onSwitchToLogin }: SignupFormProps) {
               />
             </div>
             {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
-            <p className="text-xs text-muted-foreground">
-              Use 8+ characters with upper and lower case letters and a number.
-            </p>
+            <p className="text-xs text-muted-foreground">{PASSWORD_HINT}</p>
           </div>
         </CardContent>
         <CardFooter className="flex-col gap-3">
