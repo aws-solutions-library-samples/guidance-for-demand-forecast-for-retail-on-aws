@@ -33,6 +33,9 @@
   "engines": {
     "node": ">=22"
   },
+  "overrides": {
+    "postcss": "^8.5.28"
+  },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",
