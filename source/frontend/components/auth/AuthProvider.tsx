@@ -102,7 +102,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         await new Promise((resolve) => setTimeout(resolve, 500));
         setUser({ ...MOCK_USER, email });
         setLoading(false);
-        return;
+        return { newPasswordRequired: false };
       }
 
       setLoading(true);
@@ -130,14 +130,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
           };
         }
         if (nextStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
-          throw {
-            code: 'NewPasswordRequired',
-            message: 'You must set a new password. Please contact an administrator.',
-          };
+          // Administrator-created users (for example via the Cognito console, or
+          // in accounts where self sign-up is disabled by policy) sign in with a
+          // temporary password and must choose a new one. Report it to the caller
+          // so it can prompt for the new password, rather than failing here.
+          return { newPasswordRequired: true };
         }
         if (nextStep === 'DONE' || result.isSignedIn) {
           await checkAuthState();
         }
+        return { newPasswordRequired: false };
       } catch (err: unknown) {
         console.error('Sign in error:', err);
 
@@ -157,6 +159,42 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         setError({ code: errorCode, message: errorMessage });
         throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [checkAuthState],
+  );
+
+  /**
+   * Completes the CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED challenge by
+   * replacing a temporary password. Must be called on the session started by
+   * signIn (Amplify keeps the pending challenge in memory), so do not sign out
+   * or reload between the two calls.
+   */
+  const completeNewPassword = useCallback(
+    async (newPassword: string) => {
+      if (MOCK_MODE) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        setUser(MOCK_USER);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      try {
+        const { confirmSignIn } = await import('aws-amplify/auth');
+        await confirmSignIn({ challengeResponse: newPassword });
+        await checkAuthState();
+      } catch (err) {
+        const error = err as { name?: string; code?: string; message?: string };
+        const errorCode = error.name || error.code || 'UNKNOWN';
+        let errorMessage = error.message || 'Could not set the new password';
+        if (errorCode === 'InvalidPasswordException') {
+          errorMessage = 'Password does not meet the requirements.';
+        }
+        setError({ code: errorCode, message: errorMessage });
+        throw { code: errorCode, message: errorMessage };
       } finally {
         setLoading(false);
       }
@@ -270,6 +308,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     loading,
     error,
     signIn: handleSignIn,
+    completeNewPassword,
     signUp: handleSignUp,
     confirmSignUp,
     resendSignUpCode,

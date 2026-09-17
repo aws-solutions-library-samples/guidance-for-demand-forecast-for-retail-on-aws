@@ -432,12 +432,23 @@ export interface StockAlert {
 // Hook Return Types
 // ============================================================================
 
+export interface SignInResult {
+  /**
+   * True when Cognito requires the user to replace a temporary password before
+   * the session is established (users created by an administrator start in
+   * FORCE_CHANGE_PASSWORD state). Callers should collect a new password and
+   * call completeNewPassword.
+   */
+  newPasswordRequired: boolean;
+}
+
 export interface UseAuthReturn {
   user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
   error: AuthError | null;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<SignInResult>;
+  completeNewPassword: (newPassword: string) => Promise<void>;
   signUp: (data: SignupData) => Promise<{ isConfirmed: boolean }>;
   confirmSignUp: (email: string, code: string) => Promise<void>;
   resendSignUpCode: (email: string) => Promise<void>;

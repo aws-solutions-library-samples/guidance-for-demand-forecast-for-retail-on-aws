@@ -117,6 +117,10 @@ function handler(event) {
         ),
       ],
       destinationBucket: this.websiteBucket,
+      // BucketDeployment's custom-resource Lambda defaults to 1024 MB, which
+      // fails in accounts that cap Lambda MemorySize (commonly 512 MB). These
+      // assets are small, so 512 MB is ample.
+      memoryLimit: 512,
     });
 
     new cdk.CfnOutput(this, 'WebsiteBucketNameOutput', {

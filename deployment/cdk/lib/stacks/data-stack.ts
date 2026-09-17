@@ -114,6 +114,8 @@ export class DataStack extends cdk.Stack {
       ],
       destinationBucket: this.rawDataBucket,
       destinationKeyPrefix: 'data/sales/',
+      // See note in frontend-stack: keep under the common 512 MB Lambda cap.
+      memoryLimit: 512,
     });
 
     new s3deploy.BucketDeployment(this, 'DeployProductMetadata', {
@@ -124,6 +126,8 @@ export class DataStack extends cdk.Stack {
       ],
       destinationBucket: this.rawDataBucket,
       destinationKeyPrefix: 'data/metadata/',
+      // See note in frontend-stack: keep under the common 512 MB Lambda cap.
+      memoryLimit: 512,
     });
 
     // Glue Database for data catalog
