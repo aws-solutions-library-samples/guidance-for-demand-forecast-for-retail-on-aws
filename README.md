@@ -287,6 +287,23 @@ The Guidance ships with sample data so you can run it end to end immediately.
 
 1. Sign in to the application using the CloudFront URL. On the sign-in page, choose **Sign up** to create an account, verify your email with the code Amazon Cognito sends, then sign in. To use the admin features, sign up with an address provided via `ADMIN_EMAIL` (or `adminEmails` in `cdk.json`), then **sign out and sign back in once** — the `Admin` group is applied at sign-in, so the new group claim only appears in your token after a fresh login.
 
+   **Alternative: disable self sign-up and create users directly in the user pool.** If you would rather not leave open registration enabled (or your account policy blocks it), you can turn self sign-up off and provision users yourself:
+   - Set `selfSignUpEnabled: false` in `deployment/cdk/lib/stacks/auth-stack.ts` and redeploy, or in the Amazon Cognito console open the user pool and under **Sign-up** set **Self-service sign-up** to disabled.
+   - Create each user in the Cognito console (**Users** → **Create user**) or with the CLI:
+
+     ```bash
+     aws cognito-idp admin-create-user \
+       --user-pool-id <USER_POOL_ID> \
+       --username you@example.com \
+       --user-attributes Name=email,Value=you@example.com Name=email_verified,Value=true \
+       --temporary-password '<TEMPORARY_PASSWORD>'
+     ```
+
+     Get `<USER_POOL_ID>` from the `UserPoolId` CloudFormation export. Setting `email_verified` to `true` skips the email verification step.
+
+   - Sign in to the application with the temporary password. The app detects that Amazon Cognito requires a permanent password and shows a **Set a new password** step; the new password must satisfy the user pool policy (8+ characters with upper and lower case letters and a number). After it is saved you are signed in normally.
+   - Admin access works the same way: create the user with an address listed in `ADMIN_EMAIL` / `adminEmails`, then sign out and back in once so the token carries the `Admin` group claim.
+
 2. Start the ML pipeline. Either pass `--train` to the deploy script, or start the state machine directly:
 
    ```bash
@@ -344,7 +361,7 @@ The Guidance ships with sample data so you can run it end to end immediately.
 **Additional considerations:**
 
 - This Guidance is intended as a proof of concept. Some IAM policies use wildcard (`*`) resources for SageMaker `List*` actions, which do not support resource-level permissions. Review and scope all permissions before production use.
-- Authentication uses a standard Amazon Cognito user pool with self sign-up and email verification enabled. Update `adminEmails` in `cdk.json` to your own values, and set your target Region via `accounts.dev.region` (the deployment account comes from your AWS credentials). Note that self sign-up is open — anyone with a valid email can register; for production, restrict registration (for example, a pre-sign-up Lambda trigger that allow-lists email domains, or admin-created users only).
+- Authentication uses a standard Amazon Cognito user pool with self sign-up and email verification enabled. Update `adminEmails` in `cdk.json` to your own values, and set your target Region via `accounts.dev.region` (the deployment account comes from your AWS credentials). Note that self sign-up is open — anyone with a valid email can register; for production, restrict registration (for example, a pre-sign-up Lambda trigger that allow-lists email domains, or admin-created users only). See step 1 of [Running the Guidance](#running-the-guidance) for how to disable self sign-up and create users directly in the user pool; the application supports the resulting temporary-password flow.
 - Amazon SageMaker AI Autopilot jobs and any deployed real-time endpoint incur cost while running irrespective of application usage. Delete endpoints when not in use.
 - The included datasets are synthetic sample data for demonstration purposes only.
 
