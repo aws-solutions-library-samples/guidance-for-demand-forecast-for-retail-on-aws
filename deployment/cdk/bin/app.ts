@@ -10,6 +10,11 @@ import { BackendStack } from '../lib/stacks/backend-stack';
 import { FrontendStack } from '../lib/stacks/frontend-stack';
 import { PipelineStack } from '../lib/stacks/pipeline-stack';
 
+// AWS Solutions Library identifier for this Guidance. Prefixed to every stack
+// description so deployments are attributable in CloudFormation.
+const SOLUTION_ID = 'SO9716';
+const SOLUTION_NAME = 'Guidance for Retail Demand Forecasting on AWS';
+
 const app = new cdk.App();
 
 // Region resolution order: cdk.json context (accounts.dev.region) is the single
@@ -29,7 +34,7 @@ const stackPrefix = app.node.tryGetContext('stackPrefix') || 'RetailForecast';
 // reference for CORS allow-listing and for auth callback URLs.
 const frontendStack = new FrontendStack(app, `${stackPrefix}-FrontendStack`, {
   env,
-  description: 'Frontend hosting: CloudFront distribution and S3 bucket',
+  description: `(${SOLUTION_ID}) ${SOLUTION_NAME} - Frontend hosting: CloudFront distribution and S3 bucket`,
 });
 
 // The single browser origin allowed to call the API and upload to S3 (the
@@ -38,7 +43,7 @@ const appOrigins = [`https://${frontendStack.distributionDomainName}`];
 
 const dataStack = new DataStack(app, `${stackPrefix}-DataStack`, {
   env,
-  description: 'Data infrastructure: S3 buckets, Glue catalog, Athena workgroup',
+  description: `(${SOLUTION_ID}) ${SOLUTION_NAME} - Data infrastructure: S3 buckets, Glue catalog, Athena workgroup`,
   allowedOrigins: appOrigins,
 });
 dataStack.addDependency(frontendStack);
@@ -46,14 +51,14 @@ dataStack.addDependency(frontendStack);
 // AuthStack receives CloudFront + localhost URLs for OAuth callbacks
 const authStack = new AuthStack(app, `${stackPrefix}-AuthStack`, {
   env,
-  description: 'Authentication: Cognito User Pool and Identity Pool',
+  description: `(${SOLUTION_ID}) ${SOLUTION_NAME} - Authentication: Cognito User Pool and Identity Pool`,
   callbackUrls: frontendStack.urls,
 });
 authStack.addDependency(frontendStack);
 
 const mlStack = new MLStack(app, `${stackPrefix}-MLStack`, {
   env,
-  description: 'ML infrastructure: SageMaker execution role',
+  description: `(${SOLUTION_ID}) ${SOLUTION_NAME} - ML infrastructure: SageMaker execution role`,
   rawDataBucket: dataStack.rawDataBucket,
   outputsBucket: dataStack.outputsBucket,
 });
@@ -61,7 +66,7 @@ mlStack.addDependency(dataStack);
 
 const backendStack = new BackendStack(app, `${stackPrefix}-BackendStack`, {
   env,
-  description: 'Backend API: API Gateway and Lambda functions',
+  description: `(${SOLUTION_ID}) ${SOLUTION_NAME} - Backend API: API Gateway and Lambda functions`,
   userPool: authStack.userPool,
   rawDataBucket: dataStack.rawDataBucket,
   outputsBucket: dataStack.outputsBucket,
@@ -78,7 +83,7 @@ backendStack.addDependency(frontendStack);
 
 const pipelineStack = new PipelineStack(app, `${stackPrefix}-PipelineStack`, {
   env,
-  description: 'ML pipeline: auto-training and batch inference via Step Functions',
+  description: `(${SOLUTION_ID}) ${SOLUTION_NAME} - ML pipeline: auto-training and batch inference via Step Functions`,
   rawDataBucket: dataStack.rawDataBucket,
   outputsBucket: dataStack.outputsBucket,
   sagemakerRoleArn: mlStack.sagemakerRoleArn,
